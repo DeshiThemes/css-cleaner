@@ -11,7 +11,15 @@ class CssHelper
     public static function purge(string $inputPath, string $outputPath, array $safelist, bool $dryRun = false): array
     {
         if (!File::exists($inputPath)) {
-            throw new \RuntimeException("Input path does not exist: {$inputPath}");
+            throw new \RuntimeException("<fg=red>Input path does not exist:</> {$inputPath}");
+        }
+
+        if (!self::isNodeAvailable()) {
+            throw new \RuntimeException("<fg=red>Node.js is required for PurgeCSS</>. Please install Node.js (https://nodejs.org)");
+        }
+
+        if (!self::isPurgeCssAvailable()) {
+            throw new \RuntimeException("<fg=red>PurgeCSS not found</>. Run: <fg=cyan>npm install @fullhuman/postcss-purgecss</>");
         }
 
         if (empty($safelist)) {
@@ -98,6 +106,29 @@ class CssHelper
         $cssFiles->each(function ($file) use (&$results, $bar, $dryRun) {
             try {
                 $originalSize = filesize($file->getPathname());
+
+                // Add empty file check
+                if ($originalSize === 0) {
+                    $results[] = [
+                        'file' => $file->getRelativePathname(),
+                        'original' => 0,
+                        'optimized' => 0,
+                        'saved' => 0
+                    ];
+                    $bar->advance();
+                    return;
+                }
+
+                // ... rest of the minification code
+            } catch (\Exception $e) {
+                $bar->clear();
+                throw $e;
+            }
+        });
+
+        $cssFiles->each(function ($file) use (&$results, $bar, $dryRun) {
+            try {
+                $originalSize = filesize($file->getPathname());
                 $css = file_get_contents($file->getPathname());
 
                 // Minify CSS content
@@ -161,5 +192,27 @@ class CssHelper
         $bar->setRedrawFrequency(10);
         $bar->start();
         return $bar;
+    }
+
+    private static function isNodeAvailable(): bool
+    {
+        $process = new Process(['node', '--version']);
+        try {
+            $process->mustRun();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private static function isPurgeCssAvailable(): bool
+    {
+        $process = new Process(['npx', 'purgecss', '--version']);
+        try {
+            $process->mustRun();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

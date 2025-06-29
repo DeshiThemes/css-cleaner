@@ -18,10 +18,30 @@ class PurgeCssCommand extends Command
     public function handle()
     {
 
-        if (!file_exists(base_path('node_modules/.bin/purgecss'))) {
-            $this->error("PurgeCSS not found. Please install with: npm install @fullhuman/postcss-purgecss");
+        $this->line("\n  <fg=blue>┌───────────────────────────────────────────┐</>");
+        $this->line("  <fg=blue>│</> <fg=cyan;options=bold>🧹  PURGING UNUSED CSS</> <fg=blue>                      │</>");
+        $this->line("  <fg=blue>└───────────────────────────────────────────┘</>");
+
+        // Check Node.js and PurgeCSS
+        if (!self::isNodeAvailable()) {
+            $this->line('  <fg=red>┌───────────────────────────────────────┐</>');
+            $this->line('  <fg=red>│</> <fg=white;options=bold>⚠️  NODE.JS REQUIRED</> <fg=red>                      │</>');
+            $this->line('  <fg=red>├───────────────────────────────────────┤</>');
+            $this->line('  <fg=red>│</> Please install Node.js >=16.0.0     <fg=red>│</>');
+            $this->line('  <fg=red>│</> Download: https://nodejs.org        <fg=red>│</>');
+            $this->line('  <fg=red>└───────────────────────────────────────┘</>');
             return self::FAILURE;
         }
+
+        if (!self::isPurgeCssAvailable()) {
+            $this->line('  <fg=red>┌───────────────────────────────────────┐</>');
+            $this->line('  <fg=red>│</> <fg=white;options=bold>⚠️  PURGECSS REQUIRED</> <fg=red>                     │</>');
+            $this->line('  <fg=red>├───────────────────────────────────────┤</>');
+            $this->line('  <fg=red>│</> Run: <fg=cyan>npm install @fullhuman/postcss-purgecss</> <fg=red>│</>');
+            $this->line('  <fg=red>└───────────────────────────────────────┘</>');
+            return self::FAILURE;
+        }
+
         $inputPath = $this->option('path') ?: config('csscleaner.css_path');
         $outputPath = $this->option('output') ?: config('csscleaner.output_path');
         $this->line("\n  <fg=blue>🧹</> <fg=white;options=bold>STARTING CSS PURGE</>");
@@ -51,6 +71,29 @@ class PurgeCssCommand extends Command
         } catch (\Exception $e) {
             $this->error("  💥 Error: {$e->getMessage()}");
             return self::FAILURE;
+        }
+    }
+
+
+    private static function isNodeAvailable(): bool
+    {
+        $process = new Process(['node', '--version']);
+        try {
+            $process->mustRun();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private static function isPurgeCssAvailable(): bool
+    {
+        $process = new Process(['npx', 'purgecss', '--version']);
+        try {
+            $process->mustRun();
+            return true;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }

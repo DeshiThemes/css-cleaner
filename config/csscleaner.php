@@ -1,6 +1,12 @@
 <?php
 
 return [
+
+    /**
+     * Enable/disable the package
+     */
+    'enabled' => env('CSS_CLEANER_ENABLED', true),
+
     /**
      * 🎨 CSS Source Directory
      */

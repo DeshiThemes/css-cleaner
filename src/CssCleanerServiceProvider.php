@@ -27,7 +27,6 @@ class CssCleanerServiceProvider extends ServiceProvider
         );
 
         $this->registerFacades();
-        $this->registerHelpers();
     }
 
     /**
@@ -51,15 +50,6 @@ class CssCleanerServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Register helper functions.
-     */
-    protected function registerHelpers(): void
-    {
-        if (file_exists($helpersFile = __DIR__ . '/../src/helpers.php')) {
-            require_once $helpersFile;
-        }
-    }
 
     /**
      * Publish configuration file.

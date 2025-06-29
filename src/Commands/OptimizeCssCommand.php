@@ -11,7 +11,7 @@ class OptimizeCssCommand extends Command
                            {--show-stats : Show optimization statistics}
                            {--dry-run : Simulate without saving}';
 
-    protected $description = '🚀 Optimize CSS (Purge + Minify)';
+    protected $description = '🚀 <fg=magenta>Optimize CSS</> (Purge + Minify)';
 
     public function handle()
     {
@@ -48,10 +48,10 @@ class OptimizeCssCommand extends Command
     private function displayWelcome(): void
     {
         $this->line('');
-        $this->line('  <fg=cyan>╔══════════════════════════════════════════════════════════╗</>');
-        $this->line('  <fg=cyan>║</>  <fg=white;options=bold>🚀 LARAVEL CSS OPTIMIZER</> <fg=cyan>                                   ║</>');
-        $this->line('  <fg=cyan>║</>  <fg=yellow>By DeshiThemes</> <fg=cyan>                                             ║</>');
-        $this->line('  <fg=cyan>╚══════════════════════════════════════════════════════════╝</>');
+        $this->line('  <fg=magenta>╭──────────────────────────────────────────────╮</>');
+        $this->line('  <fg=magenta>│</>  <fg=cyan;options=bold>🚀  LARAVEL CSS OPTIMIZER</> <fg=magenta>                     │</>');
+        $this->line('  <fg=magenta>│</>  <fg=yellow>By DeshiThemes</> <fg=magenta>                                   │</>');
+        $this->line('  <fg=magenta>╰──────────────────────────────────────────────╯</>');
         $this->line('');
     }
 
@@ -61,12 +61,13 @@ class OptimizeCssCommand extends Command
         $totalReduction = $this->calculateReduction($minifyResults);
 
         $this->newLine();
-        $this->line('  <fg=green>✅ SUCCESS:</> <fg=white>CSS optimization completed!</>');
-        $this->line('  <fg=blue>┌───────────────────────────────┐</>');
-        $this->line("  <fg=blue>│</> <fg=white>Files processed:</> " . str_pad(count($purgeResults), 13, ' ', STR_PAD_LEFT) . " <fg=blue>│</>");
-        $this->line("  <fg=blue>│</> <fg=white>Space saved:</> " . str_pad($this->formatBytes($totalSaved), 16, ' ', STR_PAD_LEFT) . " <fg=blue>│</>");
-        $this->line("  <fg=blue>│</> <fg=white>Size reduction:</> " . str_pad($totalReduction . '%', 12, ' ', STR_PAD_LEFT) . " <fg=blue>│</>");
-        $this->line('  <fg=blue>└───────────────────────────────┘</>');
+        $this->line('  <fg=green>╭──────────────────────────────────────────────╮</>');
+        $this->line('  <fg=green>│</> <fg=white;options=bold>✅  OPTIMIZATION COMPLETE!</> <fg=green>                   │</>');
+        $this->line('  <fg=green>├──────────────────────────────────────────────┤</>');
+        $this->line("  <fg=green>│</> <fg=white>Files processed:</> " . str_pad(count($purgeResults), 13, ' ', STR_PAD_LEFT) . "  <fg=green>│</>");
+        $this->line("  <fg=green>│</> <fg=white>Space saved:</> " . str_pad($this->formatBytes($totalSaved), 16, ' ', STR_PAD_LEFT) . "  <fg=green>│</>");
+        $this->line("  <fg=green>│</> <fg=white>Size reduction:</> " . str_pad($totalReduction . '%', 12, ' ', STR_PAD_LEFT) . "  <fg=green>│</>");
+        $this->line('  <fg=green>╰──────────────────────────────────────────────╯</>');
 
         if ($this->option('show-stats')) {
             $this->newLine();
@@ -112,5 +113,18 @@ class OptimizeCssCommand extends Command
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = floor(log($bytes, 1024));
         return round($bytes / pow(1024, $i), 2) . ' ' . $units[$i];
+    }
+
+    private function truncateFilename(string $filename, int $length = 30): string
+    {
+        if (strlen($filename) <= $length) {
+            return $filename;
+        }
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $basename = pathinfo($filename, PATHINFO_FILENAME);
+        $availableLength = $length - strlen($extension) - 3; // Account for extension and '...'
+
+        return substr($basename, 0, $availableLength) . '...' . $extension;
     }
 }
