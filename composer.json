@@ -36,7 +36,7 @@
         "mockery/mockery": "^1.5"
     },
     "bin": [
-        "bin/css-cleaner"
+        "bin/css-cleaner.php"
     ],
     "autoload": {
         "psr-4": {
