@@ -1,0 +1,7 @@
+{
+    "name": "DeshiThemes-css-cleaner",
+    "version": "1.0.0",
+    "devDependencies": {
+        "@fullhuman/postcss-purgecss": "^5.0.0"
+    }
+}
